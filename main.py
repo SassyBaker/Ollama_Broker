@@ -5,6 +5,8 @@ import uvicorn
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.openapi.utils import status_code_ranges
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+
 from sqlmodel import SQLModel, Field, create_engine, Session, select
 
 
@@ -24,6 +26,12 @@ class APIKeys(SQLModel, table=True):
     title: str = Field(nullable=False)
 
 
+class PostData(BaseModel):
+    key: str
+    image: float
+
+
+
 # SQL Model Code to initialize SQLite and create User table. User class used for serialization in CRUD
 DATABASE_URL = "sqlite:///./database.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -40,10 +48,18 @@ app = FastAPI()
 app.mount("/", StaticFiles(directory="static",html = True), name="static")
 
 
-# Home Page
+# Test Page
 @app.get("/test")
 async def root():
     return {"message": "Hello World"}
+
+
+# API Call Page
+@app.post("/api/query")
+async def query(user_data: PostData):
+    print("HI")
+    return {"message": "Hello World"}
+
 
 
 # Create User
